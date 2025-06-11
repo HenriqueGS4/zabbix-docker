@@ -1,0 +1,72 @@
+services:
+  mysql-server:
+    image: mysql:8.0
+    container_name: zabbix-mysql-server
+    restart: always
+    command: --log-bin-trust-function-creators=1
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password # ALtere para uma senha forte em produção!
+      MYSQL_DATABASE: zabbix
+      MYSQL_USER: zabbix
+      MYSQL_PASSWORD: zabbix_password # ALtere para uma senha forte em produção!
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - zabbix-net
+
+  zabbix-server:
+    image: zabbix/zabbix-server-mysql:latest
+    container_name: zabbix-server
+    restart: always
+    ports:
+      - "10051:10051" # Porta do Zabbix Server para comunicação com agentes
+    environment:
+      DB_SERVER_HOST: mysql-server
+      MYSQL_DATABASE: zabbix
+      MYSQL_USER: zabbix
+      MYSQL_PASSWORD: zabbix_password # Deve ser a mesma senha definida no MySQL
+      ZBX_STARTPOLLERS: 10
+      ZBX_STARTTRAPPERS: 5
+      ZBX_STARTPINGERS: 5
+      ZBX_STARTDISCOVERERS: 5
+      ZBX_STARTHTTPPOLLERS: 5
+    depends_on:
+      - mysql-server
+    networks:
+      - zabbix-net
+        
+  zabbix-agent:
+    image: zabbix/zabbix-agent:latest
+    container_name: zabbix-agent
+    restart: always
+    environment:
+      ZBX_SERVER_HOST: zabbix-server
+    networks:
+      - zabbix-net
+    depends_on:
+      - zabbix-server
+
+  zabbix-web-nginx-mysql:
+    image: zabbix/zabbix-web-nginx-mysql:latest
+    container_name: zabbix-web
+    restart: always
+    ports:
+      - "80:8080" # Porta para acessar a interface web do Zabbix (ajuste se 8080 estiver em uso)
+    environment:
+      DB_SERVER_HOST: mysql-server
+      MYSQL_DATABASE: zabbix
+      MYSQL_USER: zabbix
+      MYSQL_PASSWORD: zabbix_password # Deve ser a mesma senha definida no MySQL
+      PHP_TZ: America/Sao_Paulo # Ou seu fuso horário
+    depends_on:
+      - mysql-server
+      - zabbix-server
+    networks:
+      - zabbix-net
+
+volumes: # This section was missing from your paste, but is crucial for mysql_data volume
+  mysql_data:
+
+networks: # This section was also missing, crucial for zabbix-net
+  zabbix-net:
+    driver: bridge
