@@ -5,10 +5,10 @@ services:
     restart: always
     command: --log-bin-trust-function-creators=1
     environment:
-      MYSQL_ROOT_PASSWORD: root_password # ALtere para uma senha forte em produção!
+      MYSQL_ROOT_PASSWORD: root_password # Altere para uma senha forte em produção!
       MYSQL_DATABASE: zabbix
       MYSQL_USER: zabbix
-      MYSQL_PASSWORD: zabbix_password # ALtere para uma senha forte em produção!
+      MYSQL_PASSWORD: zabbix_password # Altere para uma senha forte em produção!
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -64,9 +64,9 @@ services:
     networks:
       - zabbix-net
 
-volumes: # This section was missing from your paste, but is crucial for mysql_data volume
+volumes: 
   mysql_data:
 
-networks: # This section was also missing, crucial for zabbix-net
+networks: 
   zabbix-net:
     driver: bridge
