@@ -23,7 +23,7 @@ Este projeto configura um ambiente completo com *Zabbix*, *MySQL* e *Zabbix Agen
    
 
 3. Acesse a interface web:
-   - Navegue até: [http://localhost](http://localhost)
+   - Navegue até: [http://localhost](http://localhost) (e a porta que foi colocada no compose.yml).
    - Login padrão:
      - *Usuário*: Admin
      - *Senha*: zabbix
